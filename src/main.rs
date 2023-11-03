@@ -4,6 +4,7 @@ use std::io;
 
 fn main() 
 {
+    //get_creator("MaxisCactus");
     println!("Welcome to error/metalblaze/red lattice's sporepedia getter! Please enter a starting ID to begin your range");
     let start = input_value();
     println!("What ID would you like the search to end at? (inclusive)");
@@ -78,4 +79,20 @@ fn clean_id(input: u64) -> String
         return "0".to_owned() + &input.to_string();
     }
     return "00".to_owned() + &input.to_string();
+}
+
+fn get_creator(u_id: &str)
+{
+    let file_name = format!("C:\\Users\\Ian\\projects\\sporepedia_getter\\png_pile\\u_id.png");
+
+    let url = "http://www.spore.com/rest/assets/user/MaxisCactus/0/3";
+
+    let mut file = std::fs::File::create(file_name.clone()).unwrap();
+
+    reqwest::blocking::get(url)
+            .unwrap()
+            .copy_to(&mut file)
+            .unwrap();
+
+    //println!("Creator: {}", file.to_string());
 }
