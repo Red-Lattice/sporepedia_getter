@@ -6,7 +6,6 @@ use std::path::Path;
 
 fn main() 
 {
-    //get_creator("MaxisCactus");
     check_for_file();
     println!("Welcome to error/metalblaze/red lattice's sporepedia getter! Please enter a starting ID to begin your range");
     let start = input_value();
@@ -18,7 +17,7 @@ fn main()
 
 fn check_for_file()
 {
-    fs::create_dir_all("png_pile");
+    let _ = fs::create_dir_all("png_pile");
 }
 
 fn get_range(start: u64, end: u64)
@@ -40,14 +39,14 @@ fn get_range(start: u64, end: u64)
             + "/" + &id_slice_3 
             + "/" + &i.to_string() + ".png";
 
-        let mut file = std::fs::File::create(file_name.clone()).unwrap();
+        let mut file = std::fs::File::create(file_name).unwrap();
 
         reqwest::blocking::get(url)
             .unwrap()
             .copy_to(&mut file)
             .unwrap();
 
-        let img_size = std::fs::metadata(file_name.clone()).unwrap().len();
+        let img_size = std::fs::metadata(file_name).unwrap().len();
 
         // If a png is too small, it gets deleted because it's not a real creation
         if img_size < 500
@@ -87,7 +86,8 @@ fn clean_id(input: u64) -> String
     return "00".to_owned() + &input.to_string();
 }
 
-fn get_creator(u_id: &str)
+// This code will be implemented at some later date.
+/*fn get_creator(u_id: &str)
 {
     let file_name = format!("C://Users//Ian//projects//sporepedia_getter//png_pile//u_id.png");
 
@@ -101,4 +101,4 @@ fn get_creator(u_id: &str)
             .unwrap();
 
     //println!("Creator: {}", file.to_string());
-}
+}*/
