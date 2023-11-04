@@ -7,17 +7,53 @@ use std::path::Path;
 fn main() 
 {
     check_for_file();
-    println!("Welcome to error/metalblaze/red lattice's sporepedia getter! Please enter a starting ID to begin your range");
+    println!("\nWelcome to error/metalblaze/red lattice's sporepedia getter! Please enter a starting ID to begin your range");
+    run();
+}
+
+fn run()
+{
     let start = input_value();
-    println!("What ID would you like the search to end at? (inclusive)");
+    println!("\nWhat ID would you like the search to end at? (inclusive)");
     let end = input_value();
     get_range(start, end);
-    println!("Creations successfully gathered!");
+    println!("\nCreations successfully gathered!");
+    println!("\nWould you like to search another region? (Y/N)");
+    if get_y_n_input()
+    {
+        println!("\nPlease enter a starting ID to begin your range");
+        run();
+    }
+    println!("\nProgram exited successfully");
+    return;
 }
 
 fn check_for_file()
 {
     let _ = fs::create_dir_all("png_pile");
+}
+
+fn get_y_n_input() -> bool
+{
+    let mut input = String::new();
+
+    io::stdin()
+        .read_line(&mut input)
+        .expect("Failed to read line");
+
+    let trimmed = input.trim();
+    match trimmed
+    {
+        "Y" => return true,
+        "N" => return false,
+        &_ => return failed_y_n_input(),
+    };
+}
+
+fn failed_y_n_input() -> bool
+{
+    println!("\nPlease only enter Y or N");
+    return get_y_n_input();
 }
 
 fn get_range(start: u64, end: u64)
@@ -68,7 +104,7 @@ fn input_value() -> u64
     match trimmed.parse::<u64>()
     {
         Ok(i) =>  return i,
-        Err(..) => println!("this was not a valid ID: {}", trimmed),
+        Err(..) => println!("\nthis was not a valid ID: {}", trimmed),
     };
     return 500000000000;
 }
@@ -85,20 +121,3 @@ fn clean_id(input: u64) -> String
     }
     return "00".to_owned() + &input.to_string();
 }
-
-// This code will be implemented at some later date.
-/*fn get_creator(u_id: &str)
-{
-    let file_name = format!("C://Users//Ian//projects//sporepedia_getter//png_pile//u_id.png");
-
-    let url = "http://www.spore.com/rest/assets/user/MaxisCactus/0/3";
-
-    let mut file = std::fs::File::create(file_name.clone()).unwrap();
-
-    reqwest::blocking::get(url)
-            .unwrap()
-            .copy_to(&mut file)
-            .unwrap();
-
-    //println!("Creator: {}", file.to_string());
-}*/
