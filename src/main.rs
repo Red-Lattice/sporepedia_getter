@@ -2,6 +2,7 @@ extern crate reqwest;
 use std::fs;
 use std::io;
 use std::path::Path;
+use std::{thread, time};
 
 
 fn main() 
@@ -89,6 +90,10 @@ fn get_range(start: u64, end: u64)
         {
             let _ = fs::remove_file(file_name);
         }
+
+        // Rate limiting (We don't want to ddos the servers lmao)
+        let wait_period = time::Duration::from_millis(50);
+        thread::sleep(wait_period);
     }
 }
 
