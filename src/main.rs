@@ -40,7 +40,7 @@ fn run(valid_ids: &HashSet<u64>)
 {
     println!("\nPlease enter a starting ID to begin your range");
     let start = input_value();
-    println!("\nWhat ID would you like the search to end at? (inclusive)");
+    println!("\nHow many ID's after this would you like to search? (inclusive)");
     let end = input_value();
     get_range(start, end, valid_ids);
     println!("\nCreations successfully gathered!");
@@ -75,12 +75,14 @@ fn get_y_n_input() -> bool
 fn failed_y_n_input() -> bool
 {
     println!("\nPlease only enter Y or N");
+    // If this hits recursion depth, it's user error at that point lmao
     return get_y_n_input();
 }
 
-fn get_range(start: u64, end: u64, valid_ids: &HashSet<u64>)
+fn get_range(start: u64, count: u64, valid_ids: &HashSet<u64>)
 {
-    for i in start..=end
+    let end = start + count;
+    for i in start..end
     {
         if i < MAX_ID
         {
