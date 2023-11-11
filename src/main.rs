@@ -7,16 +7,17 @@ use std::io::{BufRead, BufReader};
 use std::collections::HashSet;
 use std::fs::File;
 
-const MAX_ID:u128 = 501039850984;
+const MAX_ID:u64 = 501039850984;
 
 fn main() 
 {
     check_for_file();
-    println!("\nWelcome to error/metalblaze/red lattice's sporepedia getter! Please enter a starting ID to begin your range");
+    println!("\nWelcome to error/metalblaze/red lattice's sporepedia getter!");
+    println!("\nInitializing...");
     run(&temp());
 }
 
-fn temp() -> HashSet<u128>
+fn temp() -> HashSet<u64>
 {
     let file_1 = File::open("ids_1.txt").unwrap();
     let file_2 = File::open("ids_2.txt").unwrap();
@@ -30,8 +31,9 @@ fn temp() -> HashSet<u128>
         .map(|line| line.unwrap().parse().unwrap()).collect()
 }
 
-fn run(valid_ids: &HashSet<u128>)
+fn run(valid_ids: &HashSet<u64>)
 {
+    println!("\nPlease enter a starting ID to begin your range");
     let start = input_value();
     println!("\nWhat ID would you like the search to end at? (inclusive)");
     let end = input_value();
@@ -40,7 +42,6 @@ fn run(valid_ids: &HashSet<u128>)
     println!("\nWould you like to search another region? (Y/N)");
     if get_y_n_input()
     {
-        println!("\nPlease enter a starting ID to begin your range");
         run(valid_ids);
     }
     println!("\nProgram exited successfully");
@@ -72,7 +73,7 @@ fn failed_y_n_input() -> bool
     return get_y_n_input();
 }
 
-fn get_range(start: u128, end: u128, valid_ids: &HashSet<u128>)
+fn get_range(start: u64, end: u64, valid_ids: &HashSet<u64>)
 {
     for i in start..=end
     {
@@ -119,7 +120,7 @@ fn get_range(start: u128, end: u128, valid_ids: &HashSet<u128>)
     }
 }
 
-fn input_value() -> u128
+fn input_value() -> u64
 {
     let mut input = String::new();
 
@@ -128,7 +129,7 @@ fn input_value() -> u128
         .expect("Failed to read line");
 
     let trimmed = input.trim();
-    match trimmed.parse::<u128>()
+    match trimmed.parse::<u64>()
     {
         Ok(i) =>  return i,
         Err(..) => println!("\nthis was not a valid ID: {}", trimmed),
@@ -136,7 +137,7 @@ fn input_value() -> u128
     return 500000000000;
 }
 
-fn clean_id(input: u128) -> String
+fn clean_id(input: u64) -> String
 {
     if input > 99
     {
