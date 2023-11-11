@@ -19,16 +19,21 @@ fn main()
 
 fn temp() -> HashSet<u64>
 {
+    let mut set = HashSet::with_capacity(20_741_765);
+
     let file_1 = File::open("ids_1.txt").unwrap();
     let file_2 = File::open("ids_2.txt").unwrap();
     let file_3 = File::open("ids_3.txt").unwrap();
     let file_4 = File::open("ids_4.txt").unwrap();
 
-    BufReader::new(file_1).lines()
+    for line in BufReader::new(file_1).lines()
         .chain(BufReader::new(file_2).lines())
         .chain(BufReader::new(file_3).lines())
-        .chain(BufReader::new(file_4).lines())
-        .map(|line| line.unwrap().parse().unwrap()).collect()
+        .chain(BufReader::new(file_4).lines()) 
+        {
+            set.insert(line.unwrap().parse().unwrap());
+        }
+    return set;
 }
 
 fn run(valid_ids: &HashSet<u64>)
