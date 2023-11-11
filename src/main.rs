@@ -3,36 +3,51 @@ use std::fs;
 use std::io;
 use std::path::Path;
 use std::{thread, time};
+use std::io::{BufRead, BufReader};
+use std::collections::HashSet;
+use std::fs::File;
 
+const MAX_ID:u128 = 501039850984;
 
 fn main() 
 {
     check_for_file();
     println!("\nWelcome to error/metalblaze/red lattice's sporepedia getter! Please enter a starting ID to begin your range");
-    run();
+    run(&temp());
 }
 
-fn run()
+fn temp() -> HashSet<u128>
+{
+    let file_1 = File::open("ids_1.txt").unwrap();
+    let file_2 = File::open("ids_2.txt").unwrap();
+    let file_3 = File::open("ids_3.txt").unwrap();
+    let file_4 = File::open("ids_4.txt").unwrap();
+
+    BufReader::new(file_1).lines()
+        .chain(BufReader::new(file_2).lines())
+        .chain(BufReader::new(file_3).lines())
+        .chain(BufReader::new(file_4).lines())
+        .map(|line| line.unwrap().parse().unwrap()).collect()
+}
+
+fn run(valid_ids: &HashSet<u128>)
 {
     let start = input_value();
     println!("\nWhat ID would you like the search to end at? (inclusive)");
     let end = input_value();
-    get_range(start, end);
+    get_range(start, end, valid_ids);
     println!("\nCreations successfully gathered!");
     println!("\nWould you like to search another region? (Y/N)");
     if get_y_n_input()
     {
         println!("\nPlease enter a starting ID to begin your range");
-        run();
+        run(valid_ids);
     }
     println!("\nProgram exited successfully");
     return;
 }
 
-fn check_for_file()
-{
-    let _ = fs::create_dir_all("png_pile");
-}
+fn check_for_file() {let _ = fs::create_dir_all("png_pile");}
 
 fn get_y_n_input() -> bool
 {
@@ -57,10 +72,17 @@ fn failed_y_n_input() -> bool
     return get_y_n_input();
 }
 
-fn get_range(start: u64, end: u64)
+fn get_range(start: u128, end: u128, valid_ids: &HashSet<u128>)
 {
     for i in start..=end
     {
+        if i < MAX_ID
+        {
+            if !valid_ids.contains(&i)
+            {
+                continue;
+            }
+        }
         // We don't need to clean the first id slice because it will always be more than 100
         let id_slice_1 = (i / 1000000000).to_string();
 
@@ -97,7 +119,7 @@ fn get_range(start: u64, end: u64)
     }
 }
 
-fn input_value() -> u64
+fn input_value() -> u128
 {
     let mut input = String::new();
 
@@ -106,7 +128,7 @@ fn input_value() -> u64
         .expect("Failed to read line");
 
     let trimmed = input.trim();
-    match trimmed.parse::<u64>()
+    match trimmed.parse::<u128>()
     {
         Ok(i) =>  return i,
         Err(..) => println!("\nthis was not a valid ID: {}", trimmed),
@@ -114,7 +136,7 @@ fn input_value() -> u64
     return 500000000000;
 }
 
-fn clean_id(input: u64) -> String
+fn clean_id(input: u128) -> String
 {
     if input > 99
     {
