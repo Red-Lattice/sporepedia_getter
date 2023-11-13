@@ -6,7 +6,6 @@ use std::{thread, time};
 use std::io::{BufRead, BufReader};
 use std::collections::HashSet;
 use std::fs::File;
-use std::io::Write;
 
 const MAX_ID:u64 = 501039850984;
 
@@ -107,7 +106,7 @@ fn get_range(start: u64, count: u64, valid_ids: &HashSet<u64>)
             + "/" + &id_slice_3 
             + "/" + &i.to_string() + ".png";
 
-        let mut buffer = vec![];
+        let mut file = std::fs::File::create(file_name).unwrap();
 
         let result = reqwest::blocking::get(url.clone());
                 
@@ -126,11 +125,12 @@ fn get_range(start: u64, count: u64, valid_ids: &HashSet<u64>)
         };
         let _ = result.copy_to(&mut file);
 
+        let img_size = std::fs::metadata(file_name).unwrap().len();
+
         // If a png is too small, it gets deleted because it's not a real creation
-        if buffer.len() > 500
+        if img_size < 500
         {
-            let mut file = std::fs::File::create(file_name).unwrap();
-            file.write_all(&buffer).unwrap();
+            let _ = fs::remove_file(file_name);
         }
 
         // Rate limiting (We don't want to ddos the servers lmao)
