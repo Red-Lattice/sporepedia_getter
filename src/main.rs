@@ -14,12 +14,13 @@ fn main()
     check_for_file();
     println!("\nWelcome to error/metalblaze/red lattice's sporepedia getter!");
     println!("\nInitializing...");
-    run(&temp());
+    run(&hash_ids());
+    println!("\nProgram exited successfully");
 }
 
-fn temp() -> HashSet<u64>
+fn hash_ids() -> HashSet<u64>
 {
-    let mut set = HashSet::with_capacity(20_741_765);
+    let mut set = HashSet::new();
 
     let file_1 = File::open("ids_1.txt").unwrap();
     let file_2 = File::open("ids_2.txt").unwrap();
@@ -49,7 +50,6 @@ fn run(valid_ids: &HashSet<u64>)
     {
         run(valid_ids);
     }
-    println!("\nProgram exited successfully");
     return;
 }
 
@@ -108,10 +108,22 @@ fn get_range(start: u64, count: u64, valid_ids: &HashSet<u64>)
 
         let mut file = std::fs::File::create(file_name).unwrap();
 
-        reqwest::blocking::get(url)
-            .unwrap()
-            .copy_to(&mut file)
-            .unwrap();
+        let result = reqwest::blocking::get(url.clone());
+                
+        let mut result = match result {
+            Ok(result) => result,
+            Err(_) => 
+            {
+                loop // If there was an error in fetching the request, it just retries until it works.
+                {
+                    let result = reqwest::blocking::get(url.clone());
+                    if let Ok(result) = result {
+                        break result
+                    }
+                }
+            }
+        };
+        let _ = result.copy_to(&mut file);
 
         let img_size = std::fs::metadata(file_name).unwrap().len();
 
