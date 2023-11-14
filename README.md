@@ -8,3 +8,7 @@ It will open a command line window and prompt you to enter a starting creation I
 All creations will be put into a folder called "png_pile" in the same folder as wherever the executable is.
 
 To terminate early just close the window.
+
+# Miscellaneous important information
+- It will take a bit to initialize when you first launch it. It's turning the ID lists in to a hashmap so it can easily search them, this is also where most of the memory usage comes from.
+- There won't be any visual information displayed as it is gathering the pngs.
