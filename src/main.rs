@@ -1,4 +1,4 @@
-extern crate reqwest;
+use reqwest;
 use std::fs;
 use std::io;
 use std::path::Path;
@@ -12,29 +12,43 @@ const MAX_ID:u64 = 501039850984;
 
 fn main() 
 {
+    let mut big_list: Vec<File> = vec!();
+    check_folder(Path::new("id_stack"), &mut big_list);
+
     check_for_file();
     println!("\nWelcome to error/metalblaze/red lattice's sporepedia getter!");
     println!("\nInitializing...");
-    run(&hash_ids());
+    run(&hash_ids(big_list));
     println!("\nProgram exited successfully");
 }
 
-fn hash_ids() -> HashSet<u64>
+fn check_folder(parent_folder: &Path, big_list: &mut Vec<File>)
+{
+    let paths = fs::read_dir(parent_folder).unwrap();
+
+    for path in paths.into_iter().flatten().map(|dir|dir.path())
+    {
+        if path.is_dir()
+        {
+            check_folder(&path, big_list)
+        }
+        else
+        {
+            big_list.push(File::open(path).unwrap());
+        }
+    }
+}
+
+fn hash_ids(big_list: Vec<File>) -> HashSet<u64>
 {
     let mut set = HashSet::new();
 
-    let file_1 = File::open("ids_1.txt").unwrap();
-    let file_2 = File::open("ids_2.txt").unwrap();
-    let file_3 = File::open("ids_3.txt").unwrap();
-    let file_4 = File::open("ids_4.txt").unwrap();
+    // Folder in question is id_stack
+    for line in big_list.into_iter().map(|file|BufReader::new(file).lines()).flatten()
+    {
+        set.insert(line.unwrap().parse().unwrap());
+    }
 
-    for line in BufReader::new(file_1).lines()
-        .chain(BufReader::new(file_2).lines())
-        .chain(BufReader::new(file_3).lines())
-        .chain(BufReader::new(file_4).lines()) 
-        {
-            set.insert(line.unwrap().parse().unwrap());
-        }
     return set;
 }
 
