@@ -132,7 +132,7 @@ async fn get_range(start: u64, count: u64, valid_ids: &HashSet<u64>)
         }
         let urls = (0..ids_to_map.len()).map(|k| {
             let url = url_builder(*ids_to_map.get(k).unwrap());
-            (url, k)
+            (url, *ids_to_map.get(k).unwrap())
         });
 
         let results = futures::future::join_all(urls.map(|(url, k)|
@@ -145,6 +145,7 @@ async fn get_range(start: u64, count: u64, valid_ids: &HashSet<u64>)
         
         for (result, k) in results.into_iter()
         {
+            let url_end = k;
             let result = match result {
                 Ok(result) => result,
                 Err(_) => 
@@ -164,7 +165,7 @@ async fn get_range(start: u64, count: u64, valid_ids: &HashSet<u64>)
             // If a png is too small, it gets deleted because it's not a real creation
             if bytes.len() > 5000
             {
-                let file_name_string = "png_pile//".to_owned() + &(k as u64 + i).to_string() + ".png";
+                let file_name_string = "png_pile//".to_owned() + &url_end.to_string() + ".png";
                 let file_name = Path::new(&file_name_string);
                 let mut file = std::fs::File::create(file_name).unwrap();
                 file.write_all(&bytes).unwrap();
