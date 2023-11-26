@@ -3,11 +3,12 @@ use indicatif::{ProgressBar, ProgressStyle};
 use std::io::{BufRead, BufReader, Write};
 use std::{thread, time};
 use std::path::Path;
-use std::collections::HashSet;
+use ahash::AHashSet;
 use std::fs::File;
 use reqwest::Client;
 use std::time::Duration;
 use reqwest;
+//use std::time::SystemTime; Uncomment for debug purposes
 
 const CHECK_AT_ONCE:usize = 50;
 
@@ -20,7 +21,9 @@ async fn main()
     check_for_file();
     println!("\nWelcome to error/metalblaze/red lattice's sporepedia getter!");
     println!("\nInitializing...");
+    //let now = SystemTime::now();
     let hashed_ids = hash_ids(big_list);
+    //println!("{:?}", now.elapsed().unwrap());
     run(&hashed_ids).await;
     loop
     {
@@ -55,20 +58,20 @@ fn check_folder(parent_folder: &Path, big_list: &mut Vec<File>)
     }
 }
 
-fn hash_ids(big_list: Vec<File>) -> HashSet<u64>
+/// lmao
+fn hash_ids(big_list: Vec<File>) -> AHashSet<u64>
 {
-    let mut set = HashSet::new();
+    let mut set:AHashSet<u64> = AHashSet::new();
 
     // Folder in question is id_stack
     for line in big_list.into_iter().map(|file|BufReader::new(file).lines()).flatten()
     {
         set.insert(line.unwrap().parse().unwrap());
     }
-
     return set;
 }
 
-async fn run(valid_ids: &HashSet<u64>)
+async fn run(valid_ids: &AHashSet<u64>)
 {
     println!("\nPlease enter a starting ID to begin your range");
     let start = input_value();
@@ -106,7 +109,7 @@ fn failed_y_n_input() -> bool
 
 static APP_USER_AGENT: &str = "Sporepedia Archival Team | contact at: err.error.found@gmail.com";
 
-async fn get_range(start: u64, count: u64, valid_ids: &HashSet<u64>)
+async fn get_range(start: u64, count: u64, valid_ids: &AHashSet<u64>)
 {
     let end = start + count;
 
@@ -163,7 +166,7 @@ async fn get_range(start: u64, count: u64, valid_ids: &HashSet<u64>)
 
             let bytes = result.bytes().await.unwrap();
             // If a png is too small, it gets deleted because it's not a real creation
-            if bytes.len() > 5000
+            if bytes.len() > 500 // Replace with 31700 if you want to filter to mainly adventures and big creations
             {
                 let file_name_string = "png_pile//".to_owned() + &url_end.to_string() + ".png";
                 let file_name = Path::new(&file_name_string);
